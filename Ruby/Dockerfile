@@ -1,19 +1,17 @@
-FROM ruby:2.5.1
+FROM ruby:2.6.0
+
+ENV HOME=/usr/src/
 
 RUN apt-get update
-RUN apt-get install -y ruby-full
 RUN curl -sL https://deb.nodesource.com/setup_9.x | bash -
-RUN apt-get install -y nodejs npm
-RUN apt-get install -y npm
-RUN npm install -g yarn
+RUN apt-get install -y nodejs npm && npm install -g yarn
 
-CMD gem install rails -v 5.2.0
+WORKDIR $HOME/app
 
-RUN mkdir -p /usr/src/app
+COPY Gemfile Gemfile.lock package.json package-lock.json $HOME/app
 
-WORKDIR /usr/src/app
+RUN bundle install && yarn install
 
-VOLUME /usr/src/app
+COPY . $HOME/app
 
 EXPOSE 3000
-EXPOSE 9200
