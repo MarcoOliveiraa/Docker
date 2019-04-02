@@ -1,0 +1,38 @@
+version: '3.7'
+services:
+  postgres:
+    image: postgres:11
+    volumes:
+      - ~/docker-data/postgres:/var/lib/postgresql/data
+    networks:
+      - mbnet
+  elasticsearch:
+    image: elasticsearch:6.6.2
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - ~/docker-data/elasticsearch:/usr/share/elasticsearch/data
+    networks:
+      - mbnet
+  redis:
+    image: redis:5.0.4
+    networks:
+      - mbnet
+    ports:
+      - "6379:6379"
+  app:
+    image: maple-bear:1.0
+    container_name: maple-bear
+    volumes:
+      - .:/maple-bear
+    networks:
+      - mbnet
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+      - elasticsearch
+      - redis
+networks:
+  mbnet:
+    driver: bridge
